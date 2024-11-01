@@ -1,5 +1,6 @@
 # Portfolio Optimization with Regularized Mean-Variance Model
 
+I implement the Mean-Variance Optimization model presented by [H. Markowitz (1952)](https://www.jstor.org/stable/2975974), on the fundamental concept that the optimal portfolio selection strategy is be an optimal trade-off between the return and risk. 
 
 ## The Model
 
@@ -29,3 +30,21 @@ $$
 $$
 
 ## The Code
+
+The above mathematical model is encoded in Python Jupyter notebook with [CVXPY](https://www.cvxpy.org/) as the solver. Adding the following routine is necessary. 
+
+```javascript
+#!pip install --quiet geopy
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import networkx as nx
+import seaborn as sns
+import cvxpy as cp
+import math
+from scipy.spatial import distance_matrix
+# from geopy import distance # Library for geographical calculations
+```
+ 
+First, I preprocess the data, i.e., the satellites's locational information from a csv file. 
