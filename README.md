@@ -2,7 +2,11 @@
 
 <img src="images/stock_market.png" width="1000" >
 
-I implement the Mean-Variance Optimization model presented by [H. Markowitz (1952)](https://www.jstor.org/stable/2975974), on the fundamental concept that the optimal portfolio selection strategy is be an optimal trade-off between the return and risk. 
+I implement the Mean-Variance Optimization (MVO) model presented by [H. Markowitz (1952)](https://www.jstor.org/stable/2975974), on the fundamental concept that the optimal portfolio selection strategy is be an optimal trade-off between the return and risk. 
+
+**Decision variables:**
+
+$w = \\{w_1, w_2, ... , w_n \\}$: weight vector for all stocks. 
 
 ## The Model
 
@@ -16,11 +20,7 @@ $\mu$: expected return in percentage of stocks.
 
 $\Sigma$: covariance matrix of all stocks.
 
-**Decision variables:**
-
-$w = \\{w_1, w_2, ... , w_n \\}$: weight vector for all stocks. 
-
-**The Mean-Variance Optimization (MVO) model:**
+**The MVO model:**
 
 $$
 \begin{align}
