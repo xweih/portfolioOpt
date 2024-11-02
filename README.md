@@ -25,9 +25,8 @@ $x_{ijk} \in$ {0,1}: 1, if a walk from satellite i to j occurs in trip k, and 0,
 $$
 \begin{align}
 	\text{maximize:}	& (1-\lambda) \mu - \lambda (w \Sigma w) - \gamma \lVert w \rVert ^2 &\\    
-	\text{subject to:} 	& \sum_{j \in s} x_{0jk} = 1, & \forall k \in \Theta 	\\
-    				& \sum_{i \in s} x_{i0k} = 1,  &\forall k \in \Theta 	\\
-   				& \sum_{j \in s} x_{ijk} = y_{ik}, & \forall i \in s, k \in \Theta	\\
+	\text{subject to:} 	& \sum w = 1\\
+    				& 0 \leq w \leq 1\\
 \end{align}
 $$
 
