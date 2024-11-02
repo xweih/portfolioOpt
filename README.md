@@ -1,6 +1,6 @@
 # Portfolio Optimization with Regularized Mean-Variance Model
 
-<img src="images/xxx.png" width="1000" >
+<img src="images/stock_market.png" width="1000" >
 
 I implement the Mean-Variance Optimization model presented by [H. Markowitz (1952)](https://www.jstor.org/stable/2975974), on the fundamental concept that the optimal portfolio selection strategy is be an optimal trade-off between the return and risk. 
 
