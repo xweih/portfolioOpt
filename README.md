@@ -8,7 +8,13 @@ I implement the Mean-Variance Optimization model presented by [H. Markowitz (195
 
 **Parameters:**
 
+$\lambda$: risk aversion. 
 
+$\gamma$: regularization parameter for the L2 norm. 
+
+$\mu$: expected return in percentage of stocks.
+
+$\Sigma$: covariance matrix of all stocks.
 
 **Decision variables:**
 
@@ -18,7 +24,7 @@ $w = \\{w_1, w_2, ... , w_n \\}$: weight vector for all stocks.
 
 $$
 \begin{align}
-	\text{maximize:}	& (1-\lambda) \mu - \lambda (w \Sigma w) - \gamma \lVert w \rVert ^2 &\\    
+	\text{maximize:}	& (1 - \lambda) \mu - \lambda (w \Sigma w) - \gamma \lVert w \rVert ^2 &\\    
 	\text{subject to:} 	& \sum w = 1\\
     				& 0 \leq w \leq 1\\
 \end{align}
