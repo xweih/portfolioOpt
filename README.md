@@ -20,7 +20,7 @@ $\Sigma$: covariance matrix of all stocks.
 
 $w = \\{w_1, w_2, ... , w_n \\}$: weight vector for all stocks. 
 
-**The MILP model:**
+**The Mean-Variance Optimization (MVO) model:**
 
 $$
 \begin{align}
