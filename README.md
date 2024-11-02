@@ -6,19 +6,13 @@ I implement the Mean-Variance Optimization model presented by [H. Markowitz (195
 
 ## The Model
 
-**Indicies and Sets:**
+**Parameters:**
 
-Locations: $S=\\{0,..., N \\}$, $s = \\{1,..., N \\}$
 
-Trips: $\Theta =\\{1,..., K \\}$, $\theta =\\{2,..., K \\}$
-
-Satellite: $i, j \in S$
-
-Trip: $k \in \Theta $ 
 
 **Decision variables:**
 
-$x_{ijk} \in$ {0,1}: 1, if a walk from satellite i to j occurs in trip k, and 0, if not.  
+$w = \\{w_1, w_2, ... , w_n \\}$: weight vector for all stocks. 
 
 **The MILP model:**
 
