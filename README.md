@@ -24,7 +24,7 @@ $\Sigma$: covariance matrix of all stocks.
 
 $$
 \begin{align}
-	\text{max}	& (1 - \lambda) \mu - \lambda (w \Sigma w) - \gamma \lVert w \rVert ^2 &\\    
+	\text{max}	& (1 - \lambda) \mu - \lambda (w^T \Sigma w) - \gamma \lVert w \rVert ^2 &\\    
 	\text{s.t.} 	& \sum w = 1\\
     				& 0 \leq w \leq 1\\
 \end{align}
