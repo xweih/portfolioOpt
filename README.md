@@ -34,8 +34,61 @@ $$
 
 The above mathematical model is encoded in Python Jupyter notebook with [CVXPY](https://www.cvxpy.org/) as the solver. Adding the following routine is necessary. 
 
-```javascript
+Import libraries. 
 
+```javascript
+import cvxpy as cp
+import numpy as np
+import pandas as pd
+import yfinance as yf
+import matplotlib.pyplot as plt
 ```
- 
-First, I preprocess the data, i.e., the satellites's locational information from a csv file. 
+Import data. The Excel file "targetPrices.xlsx" should contain at least two columns, 'TICKER' and 'TARGET'. It should be noted that in this project, the target price of a stock is given as an input. Alternatively, the target price can also be calculated at a static fashion using standard models such as [Capital Asset Pricing Model (CAPM)](https://en.wikipedia.org/wiki/Capital_asset_pricing_model). 
+
+```javascript
+# The input is stock picks and their target prices from analysts
+file_path = 'input_portf/targetPrices.xlsx'
+myStocks = pd.read_excel(file_path, sheet_name='Sheet1', index_col='TICKER')[['TARGET']]
+myStocks.sort_index(inplace=True)
+```
+Data-preprocessing. 
+
+```javascript
+# Get the stock tickers and target prices
+tickers_list = myStocks.index.tolist()
+targets = myStocks['TARGET'].to_numpy()
+
+# Get stock prices from Yahoo Finance
+data = yf.download(tickers_list, start = '2019-10-1', end = '2024-11-10')['Adj Close'].dropna(how="all")
+
+prices = data.sort_index(axis=1)
+print(prices)
+```
+
+```javascript
+```
+
+```javascript
+```
+
+```javascript
+```
+
+```javascript
+```
+
+```javascript
+```
+
+```javascript
+```
+
+```javascript
+```
+
+```javascript
+```
+
+```javascript
+```
+
