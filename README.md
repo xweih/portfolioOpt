@@ -221,28 +221,333 @@ plt.show()
 
 <img src="images/porfolio_optimal.png" width="1000" >
 
+### 2. Risk vs. Return
 
 ```javascript
+# Calculate individual stock volatilities (standard deviation)
+individual_volatilities = np.sqrt(np.diag(cov_matrix))
+
+# Calculate the portfolio's expected return and volatility
+portfolio_return = np.dot(optimized_weights, expected_returns)
+portfolio_volatility = np.sqrt(optimized_weights.T @ cov_matrix @ optimized_weights)
 ```
 
 ```javascript
+import matplotlib.ticker as mticker
+import matplotlib.colors as mcolors
+
+# Stock labels
+stock_labels = tickers_list
+
+# Create a scatter plot showing return vs volatility for each stock and the optimized portfolio
+plt.figure(figsize=(12, 10))
+plt.scatter(np.array(expected_returns)[remaining_indices], 
+            np.array(individual_volatilities)[remaining_indices], 
+            color='blue', label="Stocks", s=100)
+plt.scatter(np.array(expected_returns)[owned_indices], 
+            np.array(individual_volatilities)[owned_indices], 
+            color='orange', label="Holdings", s=100)
+# plt.scatter(expected_returns, individual_volatilities, color='blue', label="Individual Stocks", s=100)
+plt.scatter(portfolio_return, portfolio_volatility, color='red', label="Optimized Portfolio", s=150)
+
+# Add labels to each stock data point
+for i, label in enumerate(stock_labels):
+    plt.text(expected_returns[i], individual_volatilities[i], f"  {label}", fontsize=12, verticalalignment='center')
+
+# Annotate the portfolio point
+plt.text(portfolio_return, portfolio_volatility, "  Portfolio", fontsize=12, verticalalignment='center')
+
+# Add labels and title
+plt.title("Return vs. Volatility", fontsize=14)
+plt.xlabel("Expected Return, $\mu$", fontsize=12)
+plt.ylabel("Volatility ,$\delta$", fontsize=12)
+
+# Add ticks and add finer grid
+ax = plt.gca()
+# ax.xaxis.set_major_locator(mticker.MultipleLocator(0.01))
+ax.xaxis.set_minor_locator(mticker.MultipleLocator(0.02))
+# ax.yaxis.set_major_locator(mticker.MultipleLocator(0.001))
+ax.yaxis.set_minor_locator(mticker.MultipleLocator(0.02))
+
+# Show grid and legend
+#plt.grid(True)
+plt.legend()
+plt.savefig("output_portf/porfolio_return_risk.png")
+plt.show()
 ```
+
+<img src="images/porfolio_return_risk.png" width="1000" >
+
+### 3. Sensitivity Analysis on $\lambda$
+
+#### 3.1 Portfolio Makeup
+
 ```javascript
+def sensPortf_lambda(num):
+    """The input, num, is the upper range where the parameter should go."""
+    
+    # df_sens = pd.DataFrame(columns = ['Parameter'] + tickers_list)   
+    df_sens = pd.DataFrame(columns = tickers_list)   
+    parameter = []
+
+    # data for diagram: return vs risk 
+    arrRet = []
+    arrVol = []
+    
+    # n = len(expected_returns)
+    # cov_matrix = S
+    
+    # Risk aversion parameter (adjust based on preference)
+    # lambda_risk_aversion = 0.5  # This balances risk vs return. Higher lambda = more risk-averse.
+    gamma_regularization = GAMMA   # Regularization parameter for L2 norm
+    max_weight = MAX_WEI             # Maximum allowed weight for any single asset (e.g., 20%)
+    
+    for i in np.linspace(0, num, 41):
+        
+        lambda_risk_aversion = i  # This balances risk vs return. Higher lambda = more risk-averse.
+        # gamma_regularization = i   # Regularization parameter for L2 norm
+        
+        # Define the optimization variables (weights of the stocks in the portfolio)
+        weights = cp.Variable(n)
+        
+        # Define the portfolio expected return (objective is to maximize this)
+        portfolio_return = expected_returns @ weights
+        
+        # Define the portfolio variance (risk)
+        portfolio_variance = cp.quad_form(weights, cov_matrix)     
+        
+        # Objective: Maximize: (1-lambda) * return - lambda * risk - gamma * L2 norm
+        objective = cp.Maximize( (1-lambda_risk_aversion) * portfolio_return - lambda_risk_aversion * portfolio_variance - gamma_regularization * cp.norm(weights, 2)**2)
+        
+        # Define the constraints: weights must sum to 1 (full investment) and no short selling (weights >= 0)
+        constraints = [cp.sum(weights) == 1, 
+                       weights >= 0,
+                       weights <= max_weight ]
+
+        # Fix the weights for mystocks
+        for idx, w in zip(owned_indices, owned_weights):
+            constraints.append(weights[idx] == w)
+    
+        # Define and solve the problem (maximize return - risk penalty)
+        problem = cp.Problem(objective, constraints)
+        problem.solve(verbose = False)
+        
+        # output 1: Get the optimized weights
+        optimized_weights = weights.value
+        # np.round(optimized_weights, decimals=3)
+
+        # df_sens.loc[len(df_sens)] = np.hstack([i, optimized_weights.T])
+        df_sens.loc[len(df_sens)] = optimized_weights.T
+        parameter.append(i)
+
+        # Output 2: portfolio's expected return and volatility
+        portfolio_return = np.dot(optimized_weights, expected_returns)
+        portfolio_volatility = np.sqrt(optimized_weights.T @ cov_matrix @ optimized_weights)
+        arrRet.append(portfolio_return)
+        arrVol.append(portfolio_volatility)
+        
+    return parameter, df_sens, arrRet, arrVol
 ```
+
 ```javascript
+# Retrieve the results 
+parameter, case_1, arrRet, arrVol = sensPortf_lambda(1)
+# print(parameter)
+# print(case_1)
 ```
+
+
 ```javascript
+# colormap options: 'tab20b' , 'viridis', 'plasma', 'Set3', or 'rainbow'.
+cmap = plt.colormaps.get_cmap('rainbow')  # Retrieve the colormap
+colors = cmap(np.linspace(0, 1, n))    # Sample n colors from the colormap
+
+fig, ax = plt.subplots(figsize=(9, 8))
+ax.stackplot(parameter, case_1.T, labels=tickers_list, alpha=0.9, colors=colors)
+ax.legend(loc=5, reverse=True, bbox_to_anchor=(1.5, 0.5), ncol=3)
+
+ax.set_title('My Portfolio by Risk Aversion, $\lambda$')
+ax.set_xlabel('Risk Aversion, $\lambda$')
+ax.set_ylabel('Percentage')
+
+# add minor ticks
+ax.xaxis.set_minor_locator(mticker.MultipleLocator(.05))
+ax.yaxis.set_minor_locator(mticker.MultipleLocator(.05))
+
+plt.savefig("output_portf/porfolio_sens_makeup_lambda.png")
+plt.show()
 ```
+
+<img src="images/porfolio_sens_makeup_lambda.png" width="1000" >
+
+#### 3.2 Risk vs. Return
+
 ```javascript
+# Create a scatter plot
+plt.figure(figsize=(8, 6))
+plt.scatter(arrRet, arrVol, color='red', s=30)
+
+# Annotate the lambda values
+lambda_labels = np.round(parameter, 2)
+
+for i in np.linspace(0, len(arrRet) - 1, 11).astype(int):
+    plt.text(arrRet[i], arrVol[i], f"  {lambda_labels[i]}", fontsize=12, verticalalignment='center')
+
+plt.text(arrRet[len(arrRet) - 1] - 0.008, arrVol[len(arrRet) - 1], f"$\lambda$=", fontsize=12, verticalalignment='center')
+plt.text(arrRet[0] - 0.008, arrVol[0], f"$\lambda$=", fontsize=12, verticalalignment='center')
+
+# Add labels and title
+plt.title("Return vs. Volatility by Risk Aversion, $\lambda$=0~1", fontsize=14)
+plt.xlabel("Expected Return, $\mu$", fontsize=12)
+plt.ylabel("Volatility ,$\delta$", fontsize=12)
+
+plt.savefig("output_portf/porfolio_sens_retVSrisk_lambda.png")
+plt.show()
 ```
+
+<img src="images/porfolio_sens_retVSrisk_lambda.png" width="1000" >
+
+### 4. Sensitivity Analysis on $\gamma$
+
+#### 4.1 Portfolio makeup
+
 ```javascript
+def sensPortf_gamma(num):
+    """The input, num, is the upper range where the parameter should go."""
+    
+    # df_sens = pd.DataFrame(columns = ['Parameter'] + tickers_list)   
+    df_sens = pd.DataFrame(columns = tickers_list)   
+    parameter = []
+
+    # data for diagram: return vs risk 
+    arrRet = []
+    arrVol = []
+    
+    # n = len(expected_returns)
+    # cov_matrix = S
+    
+    # Risk aversion parameter (adjust based on preference)
+    lambda_risk_aversion = LAMBDA  # This balances risk vs return. Higher lambda = more risk-averse.
+    # gamma_regularization = GAMMA   # Regularization parameter for L2 norm
+    max_weight = MAX_WEI             # Maximum allowed weight for any single asset (e.g., 20%)
+    
+    for i in np.linspace(0, num, 41):
+        
+        # lambda_risk_aversion = i  # This balances risk vs return. Higher lambda = more risk-averse.
+        gamma_regularization = i   # Regularization parameter for L2 norm
+        
+        # Define the optimization variables (weights of the stocks in the portfolio)
+        weights = cp.Variable(n)
+        
+        # Define the portfolio expected return (objective is to maximize this)
+        portfolio_return = expected_returns @ weights
+        
+        # Define the portfolio variance (risk)
+        portfolio_variance = cp.quad_form(weights, cov_matrix)     
+        
+        # Objective: Maximize: (1-lambda) * return - lambda * risk - gamma * L2 norm
+        objective = cp.Maximize( (1-lambda_risk_aversion) * portfolio_return - lambda_risk_aversion * portfolio_variance - gamma_regularization * cp.norm(weights, 2)**2)
+        
+        # Define the constraints: weights must sum to 1 (full investment) and no short selling (weights >= 0)
+        constraints = [cp.sum(weights) == 1, 
+                       weights >= 0,
+                       weights <= max_weight ]
+
+        # Fix the weights for mystocks
+        for idx, w in zip(owned_indices, owned_weights):
+            constraints.append(weights[idx] == w)
+    
+        # Define and solve the problem (maximize return - risk penalty)
+        problem = cp.Problem(objective, constraints)
+        problem.solve(verbose = False)
+        
+        # output 1: Get the optimized weights
+        optimized_weights = weights.value
+        # np.round(optimized_weights, decimals=3)
+
+        # df_sens.loc[len(df_sens)] = np.hstack([i, optimized_weights.T])
+        df_sens.loc[len(df_sens)] = optimized_weights.T
+        parameter.append(i)
+
+        # Output 2: portfolio's expected return and volatility
+        portfolio_return = np.dot(optimized_weights, expected_returns)
+        portfolio_volatility = np.sqrt(optimized_weights.T @ cov_matrix @ optimized_weights)
+        arrRet.append(portfolio_return)
+        arrVol.append(portfolio_volatility)
+        
+    return parameter, df_sens, arrRet, arrVol
 ```
+
 ```javascript
+# Retrieve the results 
+parameter, case_2, arrRet, arrVol = sensPortf_gamma(2)
+# print(parameter)
+# print(case_2)
 ```
+
 ```javascript
+# import matplotlib.ticker as mticker
+# import matplotlib.colors as mcolors
+
+# colormap options: 'tab20b' , 'viridis', 'plasma', 'Set3', or 'rainbow'.
+cmap = plt.colormaps.get_cmap('rainbow')  # Retrieve the colormap
+colors = cmap(np.linspace(0, 1, n))    # Sample n colors from the colormap
+
+fig, ax = plt.subplots(figsize=(9, 8))
+ax.stackplot(parameter, case_2.T, labels=tickers_list, alpha=0.9, colors=colors)
+ax.legend(loc=5, reverse=True, bbox_to_anchor=(1.5, 0.5), ncol=3)
+
+ax.set_title('My Portfolio by Regularization, $\gamma$')
+ax.set_xlabel('Regularization, $\gamma$')
+ax.set_ylabel('Percentage')
+
+# add minor ticks
+ax.xaxis.set_minor_locator(mticker.MultipleLocator(.05))
+ax.yaxis.set_minor_locator(mticker.MultipleLocator(.05))
+
+plt.savefig("output_portf/porfolio_sens_makeup_gamma.png")
+plt.show()
 ```
+
+<img src="images/porfolio_sens_makeup_gamma.png" width="1000" >
+
+#### 4.2 Risk vs. Return
+
 ```javascript
+# Create a scatter plot
+plt.figure(figsize=(8, 6))
+plt.scatter(arrRet, arrVol, color='purple', s=30)
+
+# Annotate the gamma values
+gamma_labels = np.round(parameter, 2)
+
+for i in np.linspace(0, len(arrRet) - 1, 11).astype(int):
+    plt.text(arrRet[i], arrVol[i], f"  {gamma_labels[i]}", fontsize=12, verticalalignment='center')
+
+plt.text(arrRet[len(arrRet) - 1] - 0.001, arrVol[len(arrRet) - 1], f"$\gamma$=", fontsize=12, verticalalignment='center')
+plt.text(arrRet[0] - 0.001, arrVol[0], f"$\gamma$=", fontsize=12, verticalalignment='center')
+
+# Add labels and title
+plt.title("Return vs. Volatility by Regularization, $\gamma$=0~2", fontsize=14)
+plt.xlabel("Expected Return, $\mu$", fontsize=12)
+plt.ylabel("Volatility ,$\delta$", fontsize=12)
+
+# Customize ticks and add minor grid
+# ax = plt.gca()
+# ax.xaxis.set_major_locator(mticker.MultipleLocator(0.01))
+# ax.xaxis.set_minor_locator(mticker.MultipleLocator(0.005))
+# ax.yaxis.set_major_locator(mticker.MultipleLocator(0.001))
+# ax.yaxis.set_minor_locator(mticker.MultipleLocator(0.002))
+
+# Show both major and minor grid lines
+# plt.grid(which='both', linestyle='--', linewidth=0.5)
+
+plt.savefig("output_portf/porfolio_sens_retVSrisk_gamma.png")
+plt.show()
 ```
+
+<img src="images/porfolio_sens_retVSrisk_gamma.png" width="1000" >
+
 ```javascript
 ```
 ```javascript
