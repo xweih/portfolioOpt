@@ -378,7 +378,7 @@ plt.savefig("output_portf/porfolio_sens_makeup_lambda.png")
 plt.show()
 ```
 
-<img src="images/porfolio_sens_makeup_lambda.png" width="1000" >
+<img src="images/porfolio_sens_makeup_lambda.png" width="800" >
 
 #### 3.2 Risk vs. Return
 
@@ -405,7 +405,7 @@ plt.savefig("output_portf/porfolio_sens_retVSrisk_lambda.png")
 plt.show()
 ```
 
-<img src="images/porfolio_sens_retVSrisk_lambda.png" width="1000" >
+<img src="images/porfolio_sens_retVSrisk_lambda.png" width="800" >
 
 ### 4. Sensitivity Analysis on $\gamma$
 
@@ -509,7 +509,7 @@ plt.savefig("output_portf/porfolio_sens_makeup_gamma.png")
 plt.show()
 ```
 
-<img src="images/porfolio_sens_makeup_gamma.png" width="1000" >
+<img src="images/porfolio_sens_makeup_gamma.png" width="800" >
 
 #### 4.2 Risk vs. Return
 
@@ -546,7 +546,7 @@ plt.savefig("output_portf/porfolio_sens_retVSrisk_gamma.png")
 plt.show()
 ```
 
-<img src="images/porfolio_sens_retVSrisk_gamma.png" width="1000" >
+<img src="images/porfolio_sens_retVSrisk_gamma.png" width="800" >
 
 ```javascript
 ```
