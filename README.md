@@ -1,33 +1,32 @@
 # Portfolio Optimization with Regularized Mean-Variance Model
 
-<img src="images/xxx.png" width="1000" >
+<img src="images/stock_market.png" width="1000" >
 
-I implement the Mean-Variance Optimization model presented by [H. Markowitz (1952)](https://www.jstor.org/stable/2975974), on the fundamental concept that the optimal portfolio selection strategy is be an optimal trade-off between the return and risk. 
-
-## The Model
-
-**Indicies and Sets:**
-
-Locations: $S=\\{0,..., N \\}$, $s = \\{1,..., N \\}$
-
-Trips: $\Theta =\\{1,..., K \\}$, $\theta =\\{2,..., K \\}$
-
-Satellite: $i, j \in S$
-
-Trip: $k \in \Theta $ 
+I implement the Mean-Variance Optimization (MVO) model presented by [H. Markowitz (1952)](https://www.jstor.org/stable/2975974), on the fundamental concept that the optimal portfolio selection strategy is be an optimal trade-off between the return and risk. 
 
 **Decision variables:**
 
-$x_{ijk} \in$ {0,1}: 1, if a walk from satellite i to j occurs in trip k, and 0, if not.  
+$w = \\{w_1, w_2, ... , w_n \\}$: weight vector for all stocks. 
 
-**The MILP model:**
+## The Model
+
+**Parameters:**
+
+$\lambda$: risk aversion. 
+
+$\gamma$: regularization parameter for the L2 norm. 
+
+$\mu$: expected return in percentage of stocks.
+
+$\Sigma$: covariance matrix of all stocks.
+
+**The MVO model:**
 
 $$
 \begin{align}
-	\text{minimize:}	& \text{maximize} \\{0,\ u_{ik} - U + W - D_i \\} 	&\\    
-	\text{subject to:} 	& \sum_{j \in s} x_{0jk} = 1, & \forall k \in \Theta 	\\
-    				& \sum_{i \in s} x_{i0k} = 1,  &\forall k \in \Theta 	\\
-   				& \sum_{j \in s} x_{ijk} = y_{ik}, & \forall i \in s, k \in \Theta	\\
+	\text{max}	& (1 - \lambda) \mu - \lambda (w^T \Sigma w) - \gamma \lVert w \rVert ^2 &\\    
+	\text{s.t.} 	& \sum w = 1\\
+    				& 0 \leq w \leq 1\\
 \end{align}
 $$
 
