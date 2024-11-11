@@ -108,6 +108,10 @@ S = risk_models.CovarianceShrinkage(prices).ledoit_wolf()
 plotting.plot_covariance(S, plot_correlation=True);
 S
 ```
+
+<img src="images/correlation_matrix.png" width="800" >
+
+
 ### Prepare the data format and current holdings for CVXPY
 
 ```javascript
