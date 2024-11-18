@@ -97,7 +97,7 @@ returns = np.log(prices).diff()
 cov_matrix_df = returns.cov()
 # cov_matrix_df.head()
 ```
-An alternative co-variance matrix (supposedly better)
+An alternative co-variance matrix by [Ledoit-Wolf shrinkage](http://www.ledoit.net/Review_Paper_2020_JFEc.pdf) is supposedly return a better estimation. 
 
 ```javascript
 import pypfopt
