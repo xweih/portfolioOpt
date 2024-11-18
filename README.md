@@ -20,7 +20,7 @@ $\mu$: expected return in percentage of stocks.
 
 $\Sigma$: covariance matrix of all stocks.
 
-**The MVO model:**
+**The Mean-Variance Portfolio Optimization model:**
 
 $$
 \begin{align}
