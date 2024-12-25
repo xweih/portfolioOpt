@@ -7,8 +7,8 @@ I implement the Mean-Variance Optimization (MVO) model presented by [H. Markowit
 **Decision variables:**
 
 $w = \\{w_1, w_2, ... , w_n \\}$: weight vector for all stocks. 
-
-## The Model
+ 
+## The Model 
  
 **Parameters:**
 
